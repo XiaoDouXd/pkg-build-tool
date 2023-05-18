@@ -1,115 +1,61 @@
-#include <exception>
-#include <string>
+#include "exce.h"
+#include "main-check-env.h"
+#include "main-write-files.h"
+#include "main-copy-file.h"
 
-class exce : public std::exception {
-public:
-    explicit exce(const std::string &str) : _what(str.c_str()) {}
-    explicit exce(const char *str) : _what(str) {}
-    [[nodiscard]] const char *what() const noexcept override { return _what; }
-
-private:
-    const char *_what;
-};
-
-#include "collect-files.h"
-#include <fstream>
-#include <iostream>
-#include <filesystem>
-#include <regex>
-
-namespace fs = std::filesystem;
-auto o = std::ofstream();
-
-static void tryCreateParentDir(const fs::path &p) {
-    if (fs::exists(p)) return;
-
-    const fs::path del("/");
-
-    auto temp = fs::path();
-    for (auto i = p.begin(); i != p.end(); i++) {
-        temp += *i;
-        temp += del;
-        auto j = i;
-        if (++j == p.end()) return;
-        if (!fs::exists(temp))
-            fs::create_directory(temp);
-    }
-}
-
-#include "SRC_MAIN_CPP.h"
-
-void unpackSource()
+void cmakeGen(const std::string& vsVersion)
 {
-    if(!fs::exists(outputPath + "/CMakeLists.txt")) collectStaticFiles();
-
-    auto pathToMain = outputPath + "src/main.cpp";
-    auto pathToConfig = outputPath + "Config.cmake";
-
-    system("chcp 65001");
-
-    char* sBuffer = new char[2048]{};
-    std::string name = "*", pathToProgram = "*", pathToGameFile = "*";
-
-    while(name == "*")
-    {
-        std::cout << ">> 项目名称 - project name (default as untitled): ";
-        std::cin.getline(sBuffer, 2048);
-        name = std::string(sBuffer);
-        if (name.empty()) break;
-        if (!std::regex_match(name, std::regex("[_a-zA-Z][_0-9a-zA-Z]*")))
-        {
-            std::cout << "illegal name" << std::endl;
-            name = "*";
-        }
-    }
-    if (name.empty()) name = "untitled";
-
-    while(pathToProgram == "*")
-    {
-        std::cout << ">> 项目启动程序 - path to .exe (default as ./smbx.exe): ";
-        std::cin.getline(sBuffer, 2048);
-        pathToProgram = std::string(sBuffer);
-        if (pathToProgram.empty()) break;
-        if (!std::regex_match(pathToProgram,std::regex(R"([^:<>"|*?]+.exe)")))
-        {
-            std::cout << "illegal path" << std::endl;
-            pathToProgram = "*";
-        }
-    }
-    if (pathToProgram.empty()) pathToProgram = "./smbx.exe";
-
-    while(pathToGameFile == "*")
-    {
-        std::cout << ">> 项目游戏文件 - path to gameFile (default as ./worlds/main.elvl): ";
-        std::cin.getline(sBuffer, 2048);
-        pathToGameFile = std::string(sBuffer);
-        if (pathToGameFile.empty()) break;
-        if (!std::regex_match(pathToGameFile,std::regex(R"([^:<>"|*?]+)")))
-        {
-            std::cout << "illegal path" << std::endl;
-            pathToGameFile = "*";
-        }
-    }
-    if (pathToGameFile.empty()) pathToGameFile = "./worlds/main.elvl";
-    system("cls");
-
-    auto content = std::string((const char*)RC::SRC_MAIN_CPP.data());
-    auto r = regex_replace(content, std::regex(R"(\$\{name\})"), name);
-    r = regex_replace(r, std::regex(R"(\$\{pathToProgram\})"), pathToProgram);
-    r = regex_replace(r, std::regex(R"(\$\{pathToGameFile\})"), pathToGameFile);
-    o.open(pathToMain, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-    o.write(r.data(), (long long)r.size());
-    o.close();
+    std::string cmakeCommand = "cmake -S projPath -B projBuild -G \""+ vsVersion +"\"";
+    std::cout << ">> " << cmakeCommand << std::endl;
+    int result = std::system(cmakeCommand.c_str());
+    if (result != 0) throw exce("CMake configuration failed.\n");
 }
 
 int main()
 {
     try {
+        std::system("chcp 65001");
+        checkEnv();
         unpackSource();
+        copyFile();
 
+        // build
+        // 查询当前系统的 Visual Studio 版本
+        const char* command = R"(reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /s)";
+        FILE* stream = _popen(command, "r");
+        if (stream) {
+            const int bufferSize = 2048;
+            char output[bufferSize];
+
+            while (fgets(output, bufferSize, stream) != nullptr) {
+                // 检查输出是否包含 Visual Studio 版本号
+                if (strstr(output, "15.0") != nullptr) {
+                    std::cout << ":: Detected Visual Studio 2017\n";
+                    cmakeGen("Visual Studio 15 2017");
+                    break;
+                }
+                else if (strstr(output, "16.0") != nullptr) {
+                    std::cout << "Detected Visual Studio 2019\n";
+                    cmakeGen("Visual Studio 16 2019");
+                    break;
+                }
+                else if (strstr(output, "17.0") != nullptr) {
+                    // Visual Studio 2019
+                    std::cout << "Detected Visual Studio 2022\n";
+                    cmakeGen("Visual Studio 17 2022");
+                    break;
+                }
+                throw exce("不支持的 vs 版本 - unsupported version of vs");
+            }
+            _pclose(stream);
+        }
     }
     catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << ":: err: " << e.what() << std::endl;
+        system("pause");
+        return -1;
     }
+    system("pause");
+    return 0;
 }
 

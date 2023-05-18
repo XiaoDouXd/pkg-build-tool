@@ -9,11 +9,15 @@ set(XD_RC_REGEN ON)
 add_subdirectory(rc)
 
 file(GLOB_RECURSE ALL_RES
+        3rd/*.h
+        3rd/*.hpp
+        3rd/*.c
+        3rd/*.cpp
         src/*.h
         src/*.hpp
         src/*.c
         src/*.cpp)
-include_directories(./src ./src/private ./3rd/zlib ./3rd/minizip)
+include_directories(./src ./src/private ./3rd/inireader)
 add_executable(${PROJECT_NAME} ${ALL_RES})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
