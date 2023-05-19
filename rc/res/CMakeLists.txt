@@ -31,7 +31,7 @@ endif()
 
 add_subdirectory(rc)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 # ----------------------------------------------------------- add file
@@ -62,7 +62,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else()
     message(FATAL_ERROR  "${PROJECT_NAME}::CMakeLists::Error: Unsupported compiler")
 endif()
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 # --------------------------------------------------------------------
 
 # ------------------------------------------------------------ add pkg

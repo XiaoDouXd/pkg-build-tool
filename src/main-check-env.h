@@ -9,85 +9,7 @@
 #include <filesystem>
 
 #include "inireader.h"
-#include "collect-files.h"
-
-
-const auto iniName = "envCache.ini";
-std::string s_cmakePath = "cmake";
-std::string s_msbuildPath = "msbuild";
-std::string s_name = "untitled";
-std::string s_exePath = "./smbx.exe";
-std::string s_gameFilePath = "./worlds/m.elvl";
-std::string s_srcFilePath = "./src.zip";
-std::string s_iconFilePath = "./icon.ico";
-
-int vsVersion = 0;
-std::unique_ptr<INIReader> p_reader;
-
-namespace fs = std::filesystem;
-static void tryCreateParentDir(const fs::path &p) {
-    if (fs::exists(p)) return;
-
-    const fs::path del("/");
-
-    auto temp = fs::path();
-    for (auto i = p.begin(); i != p.end(); i++) {
-        temp += *i;
-        temp += del;
-        auto j = i;
-        if (++j == p.end()) return;
-        if (!fs::exists(temp))
-            fs::create_directory(temp);
-    }
-}
-
-void saveCache()
-{
-    auto iniPath = outputPath + iniName;
-    tryCreateParentDir(iniPath);
-    std::ofstream o_ini(iniPath, std::ios_base::out | std::ios_base::trunc);
-    if (!o_ini.is_open()) return;
-    // env
-    o_ini << "[env]\n";
-    o_ini << "cmake=" << s_cmakePath << std::endl;
-    o_ini << "msbuild=" << s_msbuildPath << std::endl;
-
-    // src
-    o_ini << "[src]\n";
-    o_ini << "name=" << s_name << std::endl;
-    o_ini << "exe=" << s_exePath << std::endl;
-    o_ini << "game=" << s_gameFilePath << std::endl;
-
-    // game
-    o_ini << "[game]\n";
-    o_ini << "src=" << s_srcFilePath << std::endl;
-    o_ini << "icon=" << s_iconFilePath;
-    o_ini.close();
-}
-
-void loadCache()
-{
-    auto iniPath = outputPath + iniName;
-    p_reader = std::make_unique<INIReader>(iniPath);
-    if (p_reader->ParseError() < 0)
-    {
-        saveCache();
-        p_reader.reset();
-        p_reader = std::make_unique<INIReader>(iniPath);
-        if (p_reader->ParseError() < 0)
-        {
-            p_reader.reset();
-            throw exce(":: 无法创建或读取设置 - can't create or read config");
-        }
-    }
-
-    const auto& reader = *p_reader;
-    s_cmakePath = reader.Get("env", "cmake", s_cmakePath);
-    s_msbuildPath = reader.Get("env", "msbuild", s_msbuildPath);
-    s_name = reader.Get("src", "name", s_name);
-    s_exePath = reader.Get("src", "exe", s_exePath);
-    s_gameFilePath = reader.Get("src", "game", s_gameFilePath);
-}
+#include "main-def.h"
 
 bool isCMakeVersionGreaterThan3_24(const std::string& cmakePath)
 {
@@ -149,7 +71,7 @@ bool isMSBuildInstalled(const std::string& msbuildPath)
     }
 
     // int result = std::system(msbuildCommand.c_str());
-    return vsVersion;
+    return vsVersion >= 15;
 }
 
 std::string trimString(const std::string& str)
@@ -162,27 +84,6 @@ std::string trimString(const std::string& str)
     return str.substr(start, end - start);
 }
 
-std::string extractVisualStudioVersion(const std::string& msbuildPath) {
-    // 提取路径中的目录部分
-    std::filesystem::path directory = std::filesystem::path(msbuildPath).parent_path();
-
-    // 使用正则表达式匹配 Visual Studio 版本号
-    std::regex versionRegex(R"((\d{2})(\.\d)?)");
-    std::smatch match;
-    std::string version;
-
-    // 在目录中搜索匹配的版本号
-    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-        std::string filename = entry.path().filename().string();
-        if (std::regex_search(filename, match, versionRegex)) {
-            version = match[0];
-            break;
-        }
-    }
-
-    return version;
-}
-
 void checkEnv()
 {
     loadCache();
@@ -190,7 +91,7 @@ void checkEnv()
     while (!isCMakeVersionGreaterThan3_24(s_cmakePath))
     {
         std:: cout << ":: 不正确的 cmake 路径 - incorrect cmake path\n"
-        << ":: 请输入 cmake (version >= 3.24) 路径 - please input cmake path: ";
+        << ":: 请输入 cmake (>= 3.24) 路径 - please input cmake path: ";
 
         auto& s = s_cmakePath;
         std::getline(std::cin, s);
@@ -202,8 +103,8 @@ void checkEnv()
 
     while (!isMSBuildInstalled(s_msbuildPath))
     {
-        std::cout << ":: 找不到编译器 - can't find msvc compiler"
-        << ":: 请输入编译器路径 - please input msvc compiler path: ";
+        std::cout << ":: 找不到合适的编译器 - can't find msvc (>= vs 15 2017) compiler\n"
+        << ":: 请输入合适的编译器路径 - please input msvc compiler path: ";
 
         auto& s = s_msbuildPath;
         std::getline(std::cin, s);
@@ -212,6 +113,15 @@ void checkEnv()
         if (s.ends_with('"')) s.pop_back();
     }
     saveCache();
+
+    switch (vsVersion) {
+        case 15: vsVersionStr = "Visual Studio 15 2017"; break;
+        case 16: vsVersionStr = "Visual Studio 16 2019"; break;
+        case 17: vsVersionStr = "Visual Studio 17 2022"; break;
+        default: throw exce("错误的 vs 版本 - wrong vs version");
+    }
+    std::cout << ":: 结束检查 - env checked" << std::endl;
+
     system("pause");
     system("cls");
 }

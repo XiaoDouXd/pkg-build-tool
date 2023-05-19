@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <string>
 
-#include "collect-files.h"
+#include "main-def-extern.h"
 
 namespace fs = std::filesystem;
 auto o_static = std::ofstream();

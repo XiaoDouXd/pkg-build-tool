@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24.0)
 project(rc)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 file(GLOB_RECURSE ALL_RES "./LICENSE" "./res/*")
