@@ -14,7 +14,7 @@ set(LIBRARY_OUTPUT_PATH ${BUILD_DIR}lib)
 set(CMAKE_CACHEFILE_DIR ${BUILD_DIR})
 set(CMAKE_BUILD_TYPE ${BUILD_TYPE})
 
-project(smbx-38a-starter)
+project(exe-pkg)
 
 # -------------------------------------------------------------- icon
 set(XD_RC_WINDRES_PATH icon)
