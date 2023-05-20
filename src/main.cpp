@@ -44,7 +44,7 @@ int main()
         run(cmd);
 
         std::cout << std::endl;
-        cmd = "\"" + s_msbuildPath + "\" smbx-38a-starter.sln " + s_buildFlag;
+        cmd = "\"" + s_msbuildPath + "\" exe-pkg.sln " + s_buildFlag;
         run(cmd);
 
         std::cout << "\n:: 构建成功 - build success\n\n:: ------------------------------------------------\n\n";
