@@ -34,7 +34,7 @@ void unpackSource()
             s = "*";
         }
     }
-    if (name.empty()) name = "untitled";
+    if (name.empty()) name = s_name;
     s_name = name;
 
     while(pathToProgram == "*")
@@ -51,7 +51,7 @@ void unpackSource()
             s = "*";
         }
     }
-    if (pathToProgram.empty()) pathToProgram = "./smbx.exe";
+    if (pathToProgram.empty()) pathToProgram = s_exePath;
     s_exePath = pathToProgram;
 
     while(pathToGameFile == "*")
@@ -68,7 +68,7 @@ void unpackSource()
             s = "*";
         }
     }
-    if (pathToGameFile.empty()) pathToGameFile = "./worlds/main.elvl";
+    if (pathToGameFile.empty()) pathToGameFile = s_gameFilePath;
     s_gameFilePath = pathToGameFile;
 
 

@@ -35,7 +35,6 @@ bool isCMakeVersionGreaterThan3_24(const std::string& cmakePath)
     {
         int majorVersion = std::stoi(versionMatch[1].str());
         int minorVersion = std::stoi(versionMatch[2].str());
-        // int patchVersion = std::stoi(versionMatch[3].str());
 
         if (majorVersion > 3 || (majorVersion == 3 && minorVersion > 24))
             return true;

@@ -47,7 +47,7 @@ int main()
         cmd = "\"" + s_msbuildPath + "\" smbx-38a-starter.sln " + s_buildFlag;
         run(cmd);
 
-        std::cout << ":: 构建成功 - build success\n";
+        std::cout << "\n:: 构建成功 - build success\n\n:: ------------------------------------------------\n\n";
     }
     catch (std::exception& e) {
         std::cerr << ":: err: " << e.what() << std::endl;
