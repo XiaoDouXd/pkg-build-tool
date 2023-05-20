@@ -56,7 +56,7 @@ void unpackSource()
 
     while(pathToGameFile == "*")
     {
-        std::cout << ":: 项目启动文件 - path to gameFile (default as " + s_gameFilePath + "): ";
+        std::cout << ":: 项目启动文件 - path to input file (default as " + s_gameFilePath + "): ";
         auto& s = pathToGameFile;
 
         std::getline(std::cin, s);
