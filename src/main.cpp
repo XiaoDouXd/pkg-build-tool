@@ -9,6 +9,7 @@
 void run(std::string& cmd)
 {
     std::cout << ">> " << cmd << std::endl;
+    std::cout << std::endl;
     auto r = std::system(cmd.c_str());
     if (r != 0) throw exce("构建错误 - build fail");
     cmd.clear();
@@ -18,6 +19,8 @@ int main()
 {
     try {
         SetConsoleOutputCP(CP_UTF8);
+        system("cls");
+
         checkEnv();
         unpackSource();
         copyFile();
@@ -29,6 +32,7 @@ int main()
         std::getline(std::cin, s);
         if (s.empty()) s = s_buildFlag;
 
+        std::cout << ":: 设置完毕 - file collect success\n\n:: ------------------------------------------------\n\n";
         std::string cmd, cmakeGenPath = outputPath + "../cmake-gen";
         if (!fs::exists(cmakeGenPath)) fs::create_directory(cmakeGenPath);
         _chdir(cmakeGenPath.c_str());
@@ -39,10 +43,11 @@ int main()
             cmd = "\"" + s_cmakePath + "\"" + " -G \"" + vsVersionStr + "\" \"../" + outputPath + "\"";
         run(cmd);
 
+        std::cout << std::endl;
         cmd = "\"" + s_msbuildPath + "\" smbx-38a-starter.sln " + s_buildFlag;
         run(cmd);
 
-        std::cout << "构建成功 - build success\n";
+        std::cout << ":: 构建成功 - build success\n";
     }
     catch (std::exception& e) {
         std::cerr << ":: err: " << e.what() << std::endl;

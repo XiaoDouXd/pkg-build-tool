@@ -74,19 +74,12 @@ bool isMSBuildInstalled(const std::string& msbuildPath)
     return vsVersion >= 15;
 }
 
-std::string trimString(const std::string& str)
-{
-    size_t start = 0;
-    size_t end = str.length();
 
-    while (start < end && std::isspace(str[start])) start++;
-    while (end > start && std::isspace(str[end - 1])) end--;
-    return str.substr(start, end - start);
-}
 
 void checkEnv()
 {
     loadCache();
+    std::cout << ":: ------------------------------------------------\n\n";
 
     while (!isCMakeVersionGreaterThan3_24(s_cmakePath))
     {
@@ -95,22 +88,18 @@ void checkEnv()
 
         auto& s = s_cmakePath;
         std::getline(std::cin, s);
-        s = trimString(s);
-        if (s.starts_with('"')) s = s.substr(1);
-        if (s.ends_with('"')) s.pop_back();
+        formatPath(s);
     }
     saveCache();
 
     while (!isMSBuildInstalled(s_msbuildPath))
     {
-        std::cout << ":: 找不到合适的编译器 - can't find msvc (>= vs 15 2017) compiler\n"
-        << ":: 请输入合适的编译器路径 - please input msvc compiler path: ";
+        std::cout << ":: 找不到合适的构建程序 - can't find msbuild (>= vs 16 2019)\n"
+        << ":: 请输入合适的构建程序 - please input msbuild path: ";
 
         auto& s = s_msbuildPath;
         std::getline(std::cin, s);
-        s = trimString(s);
-        if (s.starts_with('"')) s = s.substr(1);
-        if (s.ends_with('"')) s.pop_back();
+        formatPath(s);
     }
     saveCache();
 
@@ -120,8 +109,5 @@ void checkEnv()
         case 17: vsVersionStr = "Visual Studio 17 2022"; break;
         default: throw exce("错误的 vs 版本 - wrong vs version");
     }
-    std::cout << ":: 结束检查 - env checked" << std::endl;
-
-    system("pause");
-    system("cls");
+    std::cout << ":: 结束环境检查 - env checked\n\n:: ------------------------------------------------\n\n";
 }

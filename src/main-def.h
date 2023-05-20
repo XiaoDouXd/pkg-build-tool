@@ -92,7 +92,7 @@ void loadCache()
         if (p_reader->ParseError() < 0)
         {
             p_reader.reset();
-            throw exce(":: 无法创建或读取设置 - can't create or read config");
+            throw exce("无法创建或读取设置 - can't create or read config");
         }
     }
 
@@ -105,4 +105,22 @@ void loadCache()
     s_srcFilePath = reader.Get("game", "src", s_srcFilePath);
     s_iconFilePath = reader.Get("game", "icon", s_iconFilePath);
     s_buildFlag = reader.Get("build", "flag", s_buildFlag);
+}
+
+std::string trimString(const std::string& str)
+{
+    size_t start = 0;
+    size_t end = str.length();
+
+    while (start < end && std::isspace(str[start])) start++;
+    while (end > start && std::isspace(str[end - 1])) end--;
+    return str.substr(start, end - start);
+}
+
+void formatPath(std::string& s)
+{
+    if (s.length() <= 1) return;
+    s = trimString(s);
+    if (s.starts_with('"')) s = s.substr(1);
+    if (s.ends_with('"')) s.pop_back();
 }

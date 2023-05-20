@@ -23,7 +23,7 @@ void unpackSource()
 
     while(name == "*")
     {
-        std::cout << ">> 项目名称 - project name (default as " + s_name + "): ";
+        std::cout << ":: 项目名称 - project name (default as " + s_name + "): ";
         auto& s = name;
 
         std::getline(std::cin, s);
@@ -39,10 +39,11 @@ void unpackSource()
 
     while(pathToProgram == "*")
     {
-        std::cout << ">> 项目启动程序 - path to .exe (default as " + s_exePath + "): ";
+        std::cout << ":: 项目启动程序 - path to .exe (default as " + s_exePath + "): ";
         auto& s = pathToProgram;
 
         std::getline(std::cin, s);
+        formatPath(s);
         if (s.empty()) break;
         if (!std::regex_match(s,std::regex(R"([^:<>"|*?]+.exe)")))
         {
@@ -55,10 +56,11 @@ void unpackSource()
 
     while(pathToGameFile == "*")
     {
-        std::cout << ">> 项目游戏文件 - path to gameFile (default as " + s_gameFilePath + "): ";
+        std::cout << ":: 项目游戏文件 - path to gameFile (default as " + s_gameFilePath + "): ";
         auto& s = pathToGameFile;
 
         std::getline(std::cin, s);
+        formatPath(s);
         if (s.empty()) break;
         if (!std::regex_match(s,std::regex(R"([^:<>"|*?]+)")))
         {
@@ -79,7 +81,5 @@ void unpackSource()
     o.write(r.data(), (long long)r.size());
     o.close();
 
-    std::cout << ":: 生成设置完毕 - generating set success\n";
-    system("pause");
-    system("cls");
+    std::cout << ":: 生成设置完毕 - generating set success\n\n:: ------------------------------------------------\n\n";
 }

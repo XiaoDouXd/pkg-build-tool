@@ -14,6 +14,7 @@ void copyFile()
         auto& s = icon;
 
         std::getline(std::cin, s);
+        formatPath(s);
         if (s.empty()) break;
         if (!std::regex_match(s, std::regex(R"([^<>"|*?]+.ico)")))
         {
@@ -41,6 +42,7 @@ void copyFile()
         auto& s = pack;
 
         std::getline(std::cin, s);
+        formatPath(s);
         if (s.empty()) s = s_srcFilePath;
         if (!std::regex_match(s, std::regex(R"([^<>"|*?]+.(zip|ZIP|Zip|zIP|zIp|ziP|ZIp|ZiP))")))
         {
@@ -59,7 +61,5 @@ void copyFile()
     fs::copy_file(s_srcFilePath, outputPath + "rc/res/src.zip");
     saveCache();
 
-    std::cout << ":: 源文件收集完毕 - file collect success\n";
-    system("pause");
-    system("cls");
+    std::cout << ":: 源文件收集完毕 - file collect success\n\n:: ------------------------------------------------\n\n";
 }
