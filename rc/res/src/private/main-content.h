@@ -1,17 +1,18 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <chrono>
 #include <cstring>
 #include <zconf.h>
+#include <unzip.h>
 #include <windows.h>
-
-#include "unzip.h"
 
 #include "popup.h"
 #include "SRC_ZIP.h"
 
 namespace fs = std::filesystem;
 
+#define IDI_ICON1 1
 #define MAX_FILENAME 512
 #define READ_SIZE 8192
 #define DIR_IDENTIFY '/'
@@ -19,9 +20,7 @@ namespace fs = std::filesystem;
 class exce : public std::exception {
 public:
     explicit exce(const std::string &str) : _what(str.c_str()) {}
-
     explicit exce(const char *str) : _what(str) {}
-
     [[nodiscard]] const char *what() const noexcept override { return _what; }
 
 private:
@@ -44,6 +43,30 @@ void tryCreateParentDir(const fs::path &p) {
     }
 }
 
+int count = 0;
+HINSTANCE hInst = nullptr;
+std::chrono::time_point<std::chrono::steady_clock> start;
+BOOL CALLBACK FindWindowProc(HWND hwnd, LPARAM lParam)
+{
+    DWORD processId;
+    GetWindowThreadProcessId(hwnd, &processId);
+    if (processId == (DWORD)lParam)
+    {
+        HICON hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        if (++count >= 20)
+        {
+            Sleep(250);
+            return FALSE;
+        }
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    if (duration.count() > 8000) return FALSE;
+    return TRUE;
+}
+
 void createTask(const char *content) {
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInfo;
@@ -60,6 +83,9 @@ void createTask(const char *content) {
                     nullptr, &startupInfo,
                     &processInfo);
 
+    Sleep(500);
+    start = std::chrono::high_resolution_clock::now();
+    while (EnumWindows(FindWindowProc, (LPARAM)processInfo.dwProcessId));
     // WaitForSingleObject(processInfo.hProcess, INFINITE);
     // CloseHandle(processInfo.hProcess);
     // CloseHandle(processInfo.hThread);
@@ -79,6 +105,7 @@ void openFile() {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     try {
+        hInst = hInstance;
         if (fs::exists(gameRunnerPath)) {
             openFile();
             return 0;
@@ -185,7 +212,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     catch (std::exception &e) {
         if (WPopup) DestroyWindow(WPopup);
         MessageBox(nullptr, e.what(), "app throw", MB_ICONERROR | MB_OK);
-        // std::cerr << "application exception: " << e.what();
     }
     return 0;
 }
