@@ -83,7 +83,7 @@ void createTask(const char *content) {
                     nullptr, &startupInfo,
                     &processInfo);
 
-    Sleep(500);
+    Sleep(250);
     start = std::chrono::high_resolution_clock::now();
     while (EnumWindows(FindWindowProc, (LPARAM)processInfo.dwProcessId));
     // WaitForSingleObject(processInfo.hProcess, INFINITE);
