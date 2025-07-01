@@ -66,6 +66,7 @@ bool isMSBuildInstalled(const std::string& msbuildPath)
 
     if (std::regex_search(msbuildCommand, versionMatch, versionRegex))
     {
+        std::cout << ">> msBuildReturn: " << msbuildCommand << std::endl;
         int majorVersion = std::stoi(versionMatch[1].str());
         vsVersion = majorVersion;
     }

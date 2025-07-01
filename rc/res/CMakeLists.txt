@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24.0)
 
-set(XD_RC_REGEN ON)
+set(XD_RC_REGEN OFF)
 
 set(BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/)
 set(EXECUTABLE_OUTPUT_PATH ${BUILD_DIR} CACHE PATH "Build directory" FORCE)

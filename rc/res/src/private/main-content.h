@@ -6,9 +6,22 @@
 #include <zconf.h>
 #include <unzip.h>
 #include <windows.h>
+#include <array>
+#include <cstddef>
+#include <span>
 
 #include "popup.h"
-#include "SRC_ZIP.h"
+#include "RES_ZIP.h"
+
+template<size_t size>
+void Write(std::ofstream &f, const std::array<std::span<const uint8_t>, size> data) {
+    for (const auto &sp : data) f.write((char*)sp.data(), sp.size());
+}
+
+template<size_t size>
+void Write(std::ofstream &f, const std::span<const uint8_t, size> data) {
+    f.write((char*)data.data(), data.size());
+}
 
 namespace fs = std::filesystem;
 
@@ -120,7 +133,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             fs::remove(packTempPath);
         std::ofstream f;
         f.open(packTempPath, std::ios_base::binary | std::ios_base::out | std::ios_base::trunc);
-        f.write((char *) RC::SRC_ZIP.data(), RC::SRC_ZIP.size());
+        Write(f, RC::RES_ZIP);
         f.close();
 
         fs::create_directory(gameSrcPath);

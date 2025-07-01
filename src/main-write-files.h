@@ -14,7 +14,7 @@ auto o = std::ofstream();
 
 void unpackSource()
 {
-    if(!fs::exists(outputPath + "/CMakeLists.txt")) collectStaticFiles();
+    if(!fs::exists(outputPath + "/CMakeLists.txt") || !fs::exists(outputPath + "/binary-generator.exe")) collectStaticFiles();
 
     auto pathToMain = outputPath + "src/main.cpp";
     auto pathToConfig = outputPath + "Config.cmake";

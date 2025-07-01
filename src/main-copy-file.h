@@ -1,6 +1,16 @@
 #pragma once
 
+#include "main-def-extern.h"
 #include "main-def.h"
+
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <regex>
+#include <string>
+#include <memory>
+#include <Windows.h>
+#include <filesystem>
 
 #include "ICON_ICON_ICO.h"
 
@@ -57,8 +67,24 @@ void copyFile()
     }
     s_srcFilePath = pack;
     if (!fs::exists(outputPath + "rc/res")) fs::create_directory(outputPath + "rc/res");
-    if (fs::exists(outputPath + "rc/res/src.zip")) fs::remove(outputPath + "rc/res/src.zip");
-    fs::copy_file(s_srcFilePath, outputPath + "rc/res/src.zip");
+    if (fs::exists(outputPath + "rc/res/ZIP.zip")) fs::remove(outputPath + "rc/res/ZIP.zip");
+    fs::copy_file(s_srcFilePath, outputPath + "rc/res/ZIP.zip");
+
+    std::string cmd = fs::current_path().string() + "/" + outputPath + "binary-generator.exe \"./" + outputPath + "/rc/res/ZIP.zip\"";
+    std::cout << ">> " << cmd << std::endl;
+    std::string cmdOp;
+    FILE* pipe = _popen(cmd.c_str(), "r");
+    if (pipe)
+    {
+        char buffer[1024];
+        while (!feof(pipe))
+        {
+            if (fgets(buffer, 1024, pipe) != nullptr)
+                cmdOp += buffer;
+        }
+        _pclose(pipe);
+    }
+    std::cout << ">> " << cmdOp << std::endl;
     saveCache();
 
     std::cout << ":: 源文件收集完毕 - file collect success\n\n:: ------------------------------------------------\n\n";

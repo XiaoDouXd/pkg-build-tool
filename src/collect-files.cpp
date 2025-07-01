@@ -94,12 +94,14 @@ static void writeFile(const uint8_t* data, size_t size, const char* path)
 // ----------------------------
 #include "LICENSE.h"
 #include "CMAKELISTS_TXT.h"
+#include "BINARY_GENERATOR_EXE.h"
 // ----------------------------
 
 void collectStaticFiles()
 {
     writeFile(RC::LICENSE.data(), RC::LICENSE.size(), "LICENSE");
     writeFile(RC::CMAKELISTS_TXT.data(), RC::CMAKELISTS_TXT.size(), "CMakeLists.txt");
+    writeFile(RC::BINARY_GENERATOR_EXE.data(), RC::BINARY_GENERATOR_EXE.size(), "binary-generator.exe");
 
     // ---------------------------- rc
     writeFile(RC::RC_CMAKELISTS_TXT.data(), RC::RC_CMAKELISTS_TXT.size(), "rc/CMakeLists.txt");
