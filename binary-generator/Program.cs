@@ -141,7 +141,7 @@ namespace RC {{
         }
 
         var srcList = new List<string>();
-        const int maxBlockSize = 4 * 1024 * 1024;
+        const int maxBlockSize = 1 * 1024 * 1024;
         var offset = 0;
         var name = FormatName(Path.GetFileNameWithoutExtension(input));
         var idx = 0;

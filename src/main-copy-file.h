@@ -67,6 +67,10 @@ void copyFile()
     }
     s_srcFilePath = pack;
     if (!fs::exists(outputPath + "rc/res")) fs::create_directory(outputPath + "rc/res");
+    else {
+        fs::remove(outputPath + "rc/res");
+        fs::create_directory(outputPath + "rc/res");
+    }
     if (fs::exists(outputPath + "rc/res/ZIP.zip")) fs::remove(outputPath + "rc/res/ZIP.zip");
     fs::copy_file(s_srcFilePath, outputPath + "rc/res/ZIP.zip");
 
