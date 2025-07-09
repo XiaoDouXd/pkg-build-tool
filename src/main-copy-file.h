@@ -3,7 +3,9 @@
 #include "main-def-extern.h"
 #include "main-def.h"
 
+#include <atlconv.h>
 #include <cstdlib>
+#include <fileapi.h>
 #include <iostream>
 #include <fstream>
 #include <regex>
@@ -68,7 +70,7 @@ void copyFile()
     s_srcFilePath = pack;
     if (!fs::exists(outputPath + "rc/res")) fs::create_directory(outputPath + "rc/res");
     else {
-        fs::remove(outputPath + "rc/res");
+        RemoveDirectory((outputPath + "rc/res").c_str());
         fs::create_directory(outputPath + "rc/res");
     }
     if (fs::exists(outputPath + "rc/res/ZIP.zip")) fs::remove(outputPath + "rc/res/ZIP.zip");
